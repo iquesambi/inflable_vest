@@ -1,7 +1,7 @@
 #include <MIDIUSB.h>
 
-const int enA = 9;
-const int enB = 6;
+const int deflation_pump = 9;
+const int inflation_pump = 6;
 const int valve1 = 2;
 const int valve2 = 3;
 
@@ -10,16 +10,17 @@ const int boardID = 0;
 
 // Derived note numbers
 
-const byte inflateNote = boardID * 2 + 1+36;
-const byte deflateNote = boardID * 2 + 2+36;
+const byte inflateNote = boardID * 2 + 36;
+const byte deflateNote = boardID * 2 + 36 + 1;
+
 
 void setup() {
-  pinMode(enA, OUTPUT);
-  pinMode(enB, OUTPUT);
+  pinMode(inflation_pump, OUTPUT);
+  pinMode(deflation_pump, OUTPUT);
   pinMode(valve1, OUTPUT);
   pinMode(valve2, OUTPUT);
 
-  Serial.begin(9600); // for MIDI forwarding
+Serial.begin(31250);  
 }
 
 void loop() {
@@ -70,24 +71,23 @@ void forwardMIDI(midiEventPacket_t msg) {
   Serial.write(msg.byte1);
   Serial.write(msg.byte2);
   Serial.write(msg.byte3);
-  Serial.flush();
 }
 
 void inflate(int speed) {
-  analogWrite(enB, speed);
+  analogWrite(inflation_pump, speed);
   digitalWrite(valve1, HIGH);
   digitalWrite(valve2, HIGH);
 }
 
 void deflate(int speed) {
-  analogWrite(enA, speed);
+  analogWrite(deflation_pump, speed);
   digitalWrite(valve1, LOW);
   digitalWrite(valve2, LOW);
 }
 
 void stop() {
-  analogWrite(enA, 0);
-  analogWrite(enB, 0);
+  analogWrite(inflation_pump, 0);
+  analogWrite(deflation_pump, 0);
   digitalWrite(valve1, LOW);
   digitalWrite(valve2, LOW);
 }
